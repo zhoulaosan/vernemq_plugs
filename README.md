@@ -20,20 +20,20 @@ MQTT 是一个开放的工业标准，是一个轻量级的基于发布订阅模
 
 #### 首页添加  topic 和metrics 链接
 
-![1](https://github.com/zhoulaosan/vernemq_plugs/blob/master/readme-img/1.png)
+![1](readme-img/1.png)
 
 #### 此处填写你设置的账号密码
 
-![2](https://github.com/zhoulaosan/vernemq_plugs/blob/master/readme-img/2.png)
+![2](readme-img/2.png)
 
 Topic
-![3](https://github.com/zhoulaosan/vernemq_plugs/blob/master/readme-img/3.png)
+![3](readme-img/3.png)
 平台信息监控
-![4](https://github.com/zhoulaosan/vernemq_plugs/blob/master/readme-img/4.png)
-![5](https://github.com/zhoulaosan/vernemq_plugs/blob/master/readme-img/5.png)
+![4](readme-img/4.png)
+![5](readme-img/5.png)
 
 页面模拟CMD 可做一些设置
-![6](https://github.com/zhoulaosan/vernemq_plugs/blob/master/readme-img/6.png)
+![6](readme-img/6.png)
 
 
 
