@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="/status/favicon.ico">
+
+    <title>VerneMQ Status</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="/status/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/status/css/vernemq.css" rel="stylesheet">
+
+  </head>
+
+  <body>
+
+      <div class="container">
+      <nav class="navbar navbar-expand-lg navbar-light justify-content-between">
+          <a class="navbar-brand" href="#">
+              <img src="/status/img/logo.jpg" height="60" alt="">
+          </a>
+          <a class="navbar-brand" href="#">
+              <img src="/status/img/hhlogo.jpg" height="60" alt="">
+          </a>
+          <div>
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+              <div class="navbar-nav">
+              <a class="p-2" target="_blank" href="https://docs.vernemq.com">Docs</a>
+              <a class="p-2" target="_blank" href="https://vernemq.com/contact.html">Support</a>
+              <a class="p-2" target="_blank" href="https://github.com/vernemq/vernemq">Github</a>
+              <a class="p-2" target="_blank" href="https://twitter.com/vernemq">Twitter</a>
+              <a class="p-2" target="_blank" href="https://slack-invite.vernemq.com/">Slack</a>
+              <a class="p-2" target="_blank" href="/status/topic.html">Topic</a>
+              <a class="p-2" target="_blank" href="/status/metrics.html">Metrics</a>
+              </div>
+          </div>
+          </div>
+      </nav>
+      </div>
+
+      <div class="container">
+            <div class="row">
+                <div class="col-md-12 mb-3">
+                    <h5>订阅信息</h5>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-bordered bg-light">
+                            <thead id="topic_head">
+                            </thead>
+                            <tbody id="topic_body">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+      </div>
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="/status/js/jquery-3.2.1.min.js"></script>
+    <script src="/status/js/bootstrap.min.js"></script>
+    <script src="/status/js/mustache.min.js"></script>
+      <script>
+        var url = "/api/v1/session/show?&--node&--mountpoint&--client_id&--queue_pid&--queue_size&--session_pid&--is_offline&--is_online&--statename&--deliver_mode&--offline_messages&--online_messages&--num_sessions&--clean_session&--is_plugin&--queue_started_at&--user&--peer_host&--peer_port&--protocol&--waiting_acks&--session_started_at&--topic&--qos&--rap&--no_local";
+        $.ajax({
+            type: "GET",
+            url: url,
+            dataType: "json",
+            success: function(data){
+                var topic_head_tr ="<tr >";
+                // 自动加载位置
+                // for(var key in data.table[0]){
+                //     topic_head_tr += "<th scope='col' class='text-center'>"+key+"</th>"
+                // }
+
+                //手动加载 可以调位置
+                topic_head_tr +="<th scope='col' class='text-center'>topic</th>"
+                topic_head_tr +="<th scope='col' class='text-center'>statename</th>"
+                topic_head_tr +="<th scope='col' class='text-center'>clean_session</th>"
+                topic_head_tr +="<th scope='col' class='text-center'>client_id</th>"
+                topic_head_tr +="<th scope='col' class='text-center'>node</th>"
+                topic_head_tr +="<th scope='col' class='text-center'>num_sessions</th>"
+                topic_head_tr +="<th scope='col' class='text-center'>offline_messages</th>"
+                topic_head_tr +="<th scope='col' class='text-center'>online_messages</th>"
+                topic_head_tr +="<th scope='col' class='text-center'>peer_host</th>"
+                topic_head_tr +="<th scope='col' class='text-center'>peer_port</th>"
+                topic_head_tr +="<th scope='col' class='text-center'>protocol</th>"
+                topic_head_tr +="<th scope='col' class='text-center'>qos</th>"
+                topic_head_tr +="<th scope='col' class='text-center'>queue_pid</th>"
+                topic_head_tr +="<th scope='col' class='text-center'>queue_size</th>"
+                topic_head_tr +="<th scope='col' class='text-center'>queue_started_at</th>"
+                topic_head_tr +="<th scope='col' class='text-center'>rap</th>"
+                topic_head_tr +="<th scope='col' class='text-center'>session_pid</th>"
+                topic_head_tr +="<th scope='col' class='text-center'>session_started_at</th>"
+                topic_head_tr +="<th scope='col' class='text-center'>user</th>"
+                topic_head_tr +="<th scope='col' class='text-center'>waiting_acks</th>"
+                topic_head_tr +="<th scope='col' class='text-center'>deliver_mode</th>"
+                topic_head_tr +="<th scope='col' class='text-center'>is_offline</th>"
+                topic_head_tr +="<th scope='col' class='text-center'>is_online</th>"
+                topic_head_tr +="<th scope='col' class='text-center'>is_plugin</th>"
+                topic_head_tr +="<th scope='col' class='text-center'>mountpoint</th>"
+                topic_head_tr +="<th scope='col' class='text-center'>no_local</th>"
+                topic_head_tr+="</tr>"
+                $("#topic_head").html(topic_head_tr)
+
+
+                var topic_body_tr ="";
+                for (i = 0; i < data.table.length; i++) {
+                    topic_body_tr+="<tr>"
+                    topic_body_tr+="<td class='text-center'>"+data.table[i].topic+"</td>"
+                    topic_body_tr+="<td class='text-center'>"+data.table[i].statename+"</td>"
+                    topic_body_tr+="<td class='text-center'>"+data.table[i].clean_session+"</td>"
+                    topic_body_tr+="<td class='text-center'>"+data.table[i].client_id+
+                        "<span class='badge badge-pill badge-primary' onclick=\"closebyId(\'"+data.table[i].client_id+"\')\" >close</span></td>"
+                    topic_body_tr+="<td class='text-center'>"+data.table[i].node+"</td>"
+                    topic_body_tr+="<td class='text-center'>"+data.table[i].num_sessions+"</td>"
+                    topic_body_tr+="<td class='text-center'>"+data.table[i].offline_messages+"</td>"
+                    topic_body_tr+="<td class='text-center'>"+data.table[i].online_messages+"</td>"
+                    topic_body_tr+="<td class='text-center'>"+data.table[i].peer_host+"</td>"
+                    topic_body_tr+="<td class='text-center'>"+data.table[i].peer_port+"</td>"
+                    topic_body_tr+="<td class='text-center'>"+data.table[i].protocol+"</td>"
+                    topic_body_tr+="<td class='text-center'>"+data.table[i].qos+"</td>"
+                    topic_body_tr+="<td class='text-center'>"+data.table[i].queue_pid+"</td>"
+                    topic_body_tr+="<td class='text-center'>"+data.table[i].queue_size+"</td>"
+                    topic_body_tr+="<td class='text-center'>"+data.table[i].queue_started_at+"</td>"
+                    topic_body_tr+="<td class='text-center'>"+data.table[i].rap+"</td>"
+                    topic_body_tr+="<td class='text-center'>"+data.table[i].session_pid+"</td>"
+                    topic_body_tr+="<td class='text-center'>"+data.table[i].session_started_at+"</td>"
+                    topic_body_tr+="<td class='text-center'>"+data.table[i].user+"</td>"
+                    topic_body_tr+="<td class='text-center'>"+data.table[i].waiting_acks+"</td>"
+                    topic_body_tr+="<td class='text-center'>"+data.table[i].deliver_mode+"</td>"
+                    topic_body_tr+="<td class='text-center'>"+data.table[i].is_offline+"</td>"
+                    topic_body_tr+="<td class='text-center'>"+data.table[i].is_online+"</td>"
+                    topic_body_tr+="<td class='text-center'>"+data.table[i].is_plugin+"</td>"
+                    topic_body_tr+="<td class='text-center'>"+data.table[i].mountpoint+"</td>"
+                    topic_body_tr+="<td class='text-center'>"+data.table[i].no_local+"</td>"
+                    topic_body_tr+="</tr>"
+                }
+                $("#topic_body").html(topic_body_tr)
+
+            }
+        });
+      </script>
+     <script>
+         function closebyId(id) {
+             var url  = "/api/v1/session/disconnect?client-id="+id+"&--cleanup"
+             $.ajax({
+                 type: "GET",
+                 url: url,
+                 success: function(msg){
+                     // alert(msg);
+                     window.location.reload();
+                 }
+             });
+         }
+     </script>
+  </body>
+</html>
+

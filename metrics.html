@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="/status/favicon.ico">
+
+    <title>VerneMQ Status</title>
+
+      <!-- Bootstrap core CSS -->
+      <link href="/status/css/bootstrap.min.css" rel="stylesheet">
+      <link href="/status/css/vernemq.css" rel="stylesheet">
+      <link href="/status/css/test.css" rel="stylesheet" type="text/css">
+
+  </head>
+
+  <body>
+
+      <div class="container">
+      <nav class="navbar navbar-expand-lg navbar-light justify-content-between">
+          <a class="navbar-brand" href="#">
+              <img src="/status/img/logo.jpg" height="60" alt="">
+          </a>
+          <!--<a class="navbar-brand" href="#">
+              <img src="/status/img/hhlogo.jpg" height="60" alt="">
+          </a>-->
+
+          <div>
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+              <div class="navbar-nav">
+              <a class="p-2" target="_blank" href="https://docs.vernemq.com">Docs</a>
+              <a class="p-2" target="_blank" href="https://vernemq.com/contact.html">Support</a>
+              <a class="p-2" target="_blank" href="https://github.com/vernemq/vernemq">Github</a>
+              <a class="p-2" target="_blank" href="https://twitter.com/vernemq">Twitter</a>
+              <a class="p-2" target="_blank" href="https://slack-invite.vernemq.com/">Slack</a>
+              <a class="p-2" target="_blank" href="/status/topic.html">Topic</a>
+              <a class="p-2" target="_blank" href="/status/metrics.html">Metrics</a>
+              </div>
+          </div>
+          </div>
+      </nav>
+      </div>
+
+
+
+
+          <div id="window" class="window" >
+              <div class="title" id="window_title">
+                  <span>CMD</span>
+                  <a href="#" id="close_x" style="float:right;color: white">X</a>
+              </div>
+              <div id="text">
+                  <ul>
+                      <li>Welcome... vernemq  </li>
+                  </ul>
+                  ><input style="width: 98%;" type="text" name="" id='in'>
+              </div>
+          </div>
+
+      <div class="container">
+          <div class="form-inline" style="margin-top: 4%;">
+              <h4 >Metrics</h4>
+              <button onclick="showTable()" type="button" class="btn btn-outline-primary btn-sm">表格展示</button>
+              <button onclick="showList()"type="button" class="btn btn-outline-success btn-sm">列表展示</button>
+              <button id="tanchu_btn" type="button" class="btn btn-outline-secondary btn-sm">命令窗口</button>
+          </div>
+
+          <div id="metrics_table">
+              <div class="row">
+
+                  <div class="col-md-12 mb-3">
+                      <h5>counter</h5>
+                      <div class="table-responsive">
+                          <table class="table table-striped table-bordered bg-light">
+                              <thead id="counter_head">
+                              </thead>
+                              <tbody id="counter_body">
+                              </tbody>
+                          </table>
+                      </div>
+                  </div>
+
+                  <div class="col-md-12 mb-3">
+                      <h5>gauge</h5>
+                      <div class="table-responsive">
+                          <table class="table table-striped table-bordered bg-light">
+                              <thead id="gauge_head">
+                              </thead>
+                              <tbody id="gauge_body">
+                              </tbody>
+                          </table>
+                      </div>
+                  </div>
+              </div>
+          </div>
+
+          <div id="metrics_list" style="display: none" >
+              <div class="row">
+                  <div class="col-md-12 mb-12">
+                      <h5>Metrics </h5>
+                      <!-- <p id="metrics_text"></p>-->
+                      <pre  class="text-success" style="font-size: 100%" id="metrics_text" readonly></pre>
+                  </div>
+              </div>
+          </div>
+
+      </div>
+
+
+
+    <!-- Placed at the end of the document so the pages load faster-->
+    <script src="/status/js/jquery-3.2.1.min.js"></script>
+    <script src="/status/js/bootstrap.min.js"></script>
+    <script src="/status/js/mustache.min.js"></script>
+
+      <!-- 数据解析 -->
+      <script>
+        var url = "/api/v1/metrics/show?&--with-descriptions";
+        // var url = "/api/v1/metrics/show";
+        $.ajax({
+            type: "GET",
+            url: url,
+            dataType: "json",
+            success: function(data){
+                $("#metrics_text").text(data.text)
+                var str = data.text;
+                // 先根据换行切分
+                var list = str.split('\n')
+                var counter_head = "<tr>"
+                var counter_body = "<tr>"
+                var gauge_head = "<tr>"
+                var gauge_body = "<tr>"
+                for (let x of list) {
+                    //counter. 开头的放一个数组
+                    if (x.includes("counter.")>0){
+                        x =x.replace("counter.","")
+                        counter_head+="<th scope='col' class='text-center'>"+x.substr(0,x.indexOf("="))+"</th>"
+                        counter_body+="<td class='text-center'>"+x.substr(x.indexOf("=")+2)+"</td>"
+                    }else if (x.includes("gauge.")>0){
+                    //gauge. 开头的放一个数组
+                        x =x.replace("gauge.","")
+                        gauge_head+="<th scope='col' class='text-center'>"+x.substr(0,x.indexOf("="))+"</th>"
+                        gauge_body+="<td class='text-center'>"+x.substr(x.indexOf("=")+2)+"</td>"
+                    }
+                }
+                 counter_head += "</tr>"
+                 counter_body += "</tr>"
+                 gauge_head += "</tr>"
+                 gauge_body += "</tr>"
+
+                $("#counter_head").html(counter_head)
+                $("#counter_body").html(counter_body)
+                $("#gauge_head").html(gauge_head)
+                $("#gauge_body").html(gauge_body)
+            }
+        });
+
+      </script>
+
+    <script>
+        function showTable() {
+            $("#metrics_table").show();
+            $("#metrics_list").hide();
+        }
+        function showList() {
+            $("#metrics_table").hide();
+            $("#metrics_list").show();
+        }
+    </script>
+
+      <!-- cmd  -->
+    <script>
+          $(document).ready(function(){
+              $(document).keyup(function(event){
+                  if(event.keyCode ==13){
+
+
+                      var str =$("#in").val();
+                      if (str.replace(/\s/g,"") =="help"){
+                          $("ul").append("<li>------------------------------------------------</li>");
+                          $("ul").append("<li>Usage: vernemq «command»</li>");
+                          $("ul").append("<li>where «command» is one of the following:</li>");
+                          $("ul").append("<li>&emsp;{help | set | clear }</li>");
+                          $("ul").append("<li>&emsp;set xxx = xx  请遵循 vmq指令</li>");
+                          $("ul").append("<li>&emsp;ex：set allow_publish_during_netsplit = on</li>");
+                          $("ul").append("<li>&emsp;clear   清屏</li>");
+                          $("ul").append("<li>&emsp;其他功能正在建设中。。。</li>");
+                          $("ul").append("<li>&emsp;</li>");
+                          $("#in").val("");
+                          $("#text").scrollTop($("#text").scrollTop()+32);//滚动条拉到最下面，显示出输入框
+
+                      }else if(str.replace(/\s/g,"") =="clear"){
+                          $("ul").html("");
+                          $("#in").val("");
+                      }else{
+                          list = str.trim().split(/\s+/)
+                          var url = "/api/v1/"+list[0]+"?"+str.replace(/\s/g,"").substr(list[0].length)
+                          // alert(url)
+                          $.ajax({
+                              type: "GET",
+                              url: url,
+                              // data: "code="+$("#in").val(),
+                              success: function(msg){
+                                  $("ul").append("<li>"+$("#in").val()+"</li>");  //将输入的输出到界面
+                                  $("ul").append("<li>"+msg+"</li>");            //获取返回值并输出
+                                  $("ul").append("<li>ok</li>");
+                                  $("#in").val("");                               //清空输入框
+                                  $("#text").scrollTop($("#text").scrollTop()+32);//滚动条拉到最下面，显示出输入框
+                              },
+                              error:function(data){
+                                  $("ul").append("<li>  Use --help after a command for more details.</li>");
+                                  $("#in").val("");
+                              }
+
+                          });
+
+                      }
+                  }
+              });
+              $("#in")[0].focus();
+          });
+      </script>
+
+      <!-- 窗口事件 -->
+    <script>
+
+        $(function() {
+            $(".window").hide();
+            $("#tanchu_btn").click(function() {
+                $(".window").fadeIn(300);
+                $("#in").focus();
+                $("#close_x").click(function() {
+                    $(".window").fadeOut(200);
+                });
+            });
+        });
+
+        //窗口移动
+        $("#window_title").mousedown(function(event) {
+            var isMove = true;
+            var abs_x = event.pageX - $('div.window').offset().left;
+            var abs_y = event.pageY - $('div.window').offset().top;
+            $(document).mousemove(function(event) {
+                if (isMove) {
+                    var obj = $('div.window');
+                    var left_x = event.pageX - abs_x;
+                    var top_y = event.pageY - abs_y;
+                    obj.css({
+                        'left': left_x,
+                        'top': top_y
+                    });
+                }
+            }).mouseup(function() {
+                isMove = false;
+            });
+
+            $("#in").focus();
+        });
+
+    </script>
+
+  </body>
+</html>
+
